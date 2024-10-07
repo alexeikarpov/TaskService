@@ -18,7 +18,7 @@ public class TaskController {
     private TaskService taskManager;
 
     @PostMapping("/create")
-    public Task addTask(@RequestBody CreateTaskRequest request) {
+    public String addTask(@RequestBody CreateTaskRequest request) {
         Task task = new Task(
                 UUID.randomUUID(),
                 request.getName(),
@@ -26,7 +26,7 @@ public class TaskController {
                 request.getTimeToComplete());
 
         boolean success = taskManager.addTask(task);
-        return success ? task : null;
+        return success ? "Task created" : "Task not created";
     }
 
     @PostMapping("/update/time")

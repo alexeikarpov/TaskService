@@ -19,7 +19,11 @@ public class TaskService {
 
     public boolean addTask(Task task) {
         String key = String.valueOf(task.getId());
-        return tasks.put(key, task) != null;
+        if (tasks.containsKey(key)) {
+            return false;
+        }
+        tasks.put(key, task);
+        return true;
     }
 
     public boolean removeTask(Task task) {
