@@ -18,8 +18,7 @@ public class TaskService {
         String sql = "INSERT INTO tasks (id, name, description, time_to_complete) VALUES (?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setObject(1, task.getId());
             stmt.setString(2, task.getName());
             stmt.setString(3, task.getDescription());
@@ -73,15 +72,32 @@ public class TaskService {
         return tasks;
     }
 
-//    public Collection<Task> findTasks(String keyword) {
-//        Collection<Task> tasks_ = new ArrayList<>();
-//        for (Task task : tasks.values()) {
-//            if (task.getName().toLowerCase().contains(keyword.toLowerCase())) {
-//                tasks_.add(task);
-//            }
-//        }
-//        return tasks_;
-//    }
+    public Collection<Task> findTasks(String keyword) {
+        String sql = "SELECT id, name, description, time_to_complete FROM tasks WHERE LOWER(name) LIKE ?";
+        Collection<Task> tasks = new ArrayList<>();
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%" + keyword.toLowerCase() + "%");
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Task task = new Task();
+                    task.setId((UUID) rs.getObject("id"));
+                    task.setName(rs.getString("name"));
+                    task.setDescription(rs.getString("description"));
+                    task.setTimeToCompleteSeconds(rs.getLong("time_to_complete"));
+                    task.setTimeToComplete(Duration.ofSeconds(rs.getLong("time_to_complete")));
+
+                    tasks.add(task);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tasks;
+    }
+
 
     public boolean updateTimeToComplete(UpdateTimeRequest request) {
         String selectSql = "SELECT time_to_complete FROM tasks WHERE id = ?";
@@ -89,8 +105,10 @@ public class TaskService {
 
         try (Connection conn = DatabaseConnection.getConnection()) {
             long currentTimeToComplete;
+
             try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
                 selectStmt.setObject(1, request.getId());
+
                 try (ResultSet rs = selectStmt.executeQuery()) {
                     if (rs.next()) {
                         currentTimeToComplete = rs.getLong("time_to_complete");
@@ -100,6 +118,7 @@ public class TaskService {
                 }
             }
             long updatedTimeToComplete = currentTimeToComplete - request.getDuration().getSeconds();
+
             try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
                 updateStmt.setLong(1, updatedTimeToComplete);
                 updateStmt.setObject(2, request.getId());

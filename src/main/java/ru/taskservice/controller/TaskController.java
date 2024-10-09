@@ -46,8 +46,8 @@ public class TaskController {
         return taskManager.getAllTasks();
     }
 
-//    @GetMapping("/search")
-//    public Collection<Task> findTasks(@RequestParam("keyword") String keyword) {
-//        return taskManager.findTasks(keyword);
-//    }
+    @GetMapping("/search")
+    public Collection<Task> findTasks(@RequestParam("keyword") String keyword) {
+        return taskManager.findTasks(keyword);
+    }
 }
