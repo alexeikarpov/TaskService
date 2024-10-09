@@ -1,6 +1,7 @@
 package ru.taskservice.service;
 
 import org.springframework.stereotype.Service;
+import ru.taskservice.model.DefaultStatus;
 import ru.taskservice.model.Task;
 import ru.taskservice.model.UpdateTimeRequest;
 import ru.taskservice.repository.DatabaseConnection;
@@ -15,14 +16,15 @@ import java.util.*;
 public class TaskService {
 
     public boolean addTask(Task task) {
-        String sql = "INSERT INTO tasks (id, name, description, time_to_complete) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO tasks (id, name, description, default_status, time_to_complete_seconds) VALUES (?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseConnection.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setObject(1, task.getId());
             stmt.setString(2, task.getName());
             stmt.setString(3, task.getDescription());
-            stmt.setLong(4, task.getTimeToCompleteSeconds());
+            stmt.setString(4, task.getDefaultStatus().getStatus());
+            stmt.setLong(5, task.getTimeToCompleteSeconds());
             stmt.executeUpdate();
 
             return true;
@@ -49,7 +51,7 @@ public class TaskService {
     }
 
     public Collection<Task> getAllTasks() {
-        String sql = "SELECT id, name, description, time_to_complete FROM tasks";
+        String sql = "SELECT id, name, description, default_status, time_to_complete_seconds FROM tasks";
         Collection<Task> tasks = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -61,8 +63,9 @@ public class TaskService {
                 task.setId((UUID) rs.getObject("id"));
                 task.setName(rs.getString("name"));
                 task.setDescription(rs.getString("description"));
-                task.setTimeToCompleteSeconds(rs.getLong("time_to_complete"));
-                task.setTimeToComplete(Duration.ofSeconds(rs.getLong("time_to_complete")));
+                task.setDefaultStatus(DefaultStatus.fromString(rs.getString("default_status")));
+                task.setTimeToCompleteSeconds(rs.getLong("time_to_complete_seconds"));
+                task.setTimeToComplete(Duration.ofSeconds(rs.getLong("time_to_complete_seconds")));
                 tasks.add(task);
             }
         } catch (SQLException e) {
@@ -73,7 +76,7 @@ public class TaskService {
     }
 
     public Collection<Task> findTasks(String keyword) {
-        String sql = "SELECT id, name, description, time_to_complete FROM tasks WHERE LOWER(name) LIKE ?";
+        String sql = "SELECT id, name, description, default_statusm, time_to_complete_seconds FROM tasks WHERE LOWER(name) LIKE ?";
         Collection<Task> tasks = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -86,6 +89,7 @@ public class TaskService {
                     task.setId((UUID) rs.getObject("id"));
                     task.setName(rs.getString("name"));
                     task.setDescription(rs.getString("description"));
+                    task.setDefaultStatus(DefaultStatus.fromString(rs.getString("default_status")));
                     task.setTimeToCompleteSeconds(rs.getLong("time_to_complete"));
                     task.setTimeToComplete(Duration.ofSeconds(rs.getLong("time_to_complete")));
 
@@ -100,8 +104,8 @@ public class TaskService {
 
 
     public boolean updateTimeToComplete(UpdateTimeRequest request) {
-        String selectSql = "SELECT time_to_complete FROM tasks WHERE id = ?";
-        String updateSql = "UPDATE tasks SET time_to_complete = ? WHERE id = ?";
+        String selectSql = "SELECT time_to_complete_seconds FROM tasks WHERE id = ?";
+        String updateSql = "UPDATE tasks SET time_to_complete_seconds = ? WHERE id = ?";
 
         try (Connection conn = DatabaseConnection.getConnection()) {
             long currentTimeToComplete;
@@ -111,7 +115,7 @@ public class TaskService {
 
                 try (ResultSet rs = selectStmt.executeQuery()) {
                     if (rs.next()) {
-                        currentTimeToComplete = rs.getLong("time_to_complete");
+                        currentTimeToComplete = rs.getLong("time_to_complete_seconds");
                     } else {
                         return false;
                     }

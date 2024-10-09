@@ -22,6 +22,7 @@ public class TaskController {
         Task task = new Task(
                 request.getName(),
                 request.getDescription(),
+                request.getDefaultStatus(),
                 request.getTimeToComplete());
 
         boolean success = taskManager.addTask(task);

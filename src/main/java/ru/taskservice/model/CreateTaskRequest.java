@@ -9,6 +9,7 @@ import java.time.Duration;
 public class CreateTaskRequest {
     private String name;
     private String description;
+    private DefaultStatus defaultStatus;
     private Duration timeToComplete;
 
     public CreateTaskRequest() {}
