@@ -12,4 +12,9 @@ public class UpdateTimeRequest {
     private Duration duration;
 
     public UpdateTimeRequest() {}
+
+    public UpdateTimeRequest(UUID id, Duration duration) {
+        this.id = id;
+        this.duration = duration;
+    }
 }

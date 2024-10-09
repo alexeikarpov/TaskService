@@ -28,15 +28,16 @@ public class TaskController {
         return success ? "Task created" : "Task not created";
     }
 
-    @PostMapping("/update/time")
-    public String updateTimeToComplete(@RequestBody UpdateTimeRequest request) {
-        boolean success = taskManager.updateTimeToComplete(request);
+    @PostMapping("/{id}/update/time")
+    public String updateTimeToComplete(@PathVariable("id") UUID id, @RequestBody UpdateTimeRequest request) {
+        UpdateTimeRequest request_ = new UpdateTimeRequest(id, request.getDuration());
+        boolean success = taskManager.updateTimeToComplete(request_);
         return success ? "Time updated successfully" : "Time not updated";
     }
 
-    @DeleteMapping
-    public String removeTask(@RequestBody Task task) {
-        boolean success = taskManager.removeTask(task.getId());
+    @DeleteMapping("/{id}/delete")
+    public String removeTask(@PathVariable("id") UUID id) {
+        boolean success = taskManager.removeTask(id);
         return success ? "Task removed successfully" : "Task not found";
     }
 
