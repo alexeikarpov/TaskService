@@ -20,7 +20,6 @@ public class TaskController {
     @PostMapping("/create")
     public String addTask(@RequestBody CreateTaskRequest request) {
         Task task = new Task(
-                UUID.randomUUID(),
                 request.getName(),
                 request.getDescription(),
                 request.getTimeToComplete());
@@ -37,7 +36,7 @@ public class TaskController {
 
     @DeleteMapping
     public String removeTask(@RequestBody Task task) {
-        boolean success = taskManager.removeTask(task);
+        boolean success = taskManager.removeTask(task.getId());
         return success ? "Task removed successfully" : "Task not found";
     }
 
@@ -46,8 +45,8 @@ public class TaskController {
         return taskManager.getAllTasks();
     }
 
-    @GetMapping("/search")
-    public Collection<Task> findTasks(@RequestParam("keyword") String keyword) {
-        return taskManager.findTasks(keyword);
-    }
+//    @GetMapping("/search")
+//    public Collection<Task> findTasks(@RequestParam("keyword") String keyword) {
+//        return taskManager.findTasks(keyword);
+//    }
 }
