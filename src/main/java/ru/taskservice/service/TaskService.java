@@ -1,8 +1,7 @@
 package ru.taskservice.service;
 
 import org.springframework.stereotype.Service;
-import ru.taskservice.dto.UpdateTaskFieldRequest;
-import ru.taskservice.dto.UpdateTimeRequest;
+import ru.taskservice.dto.*;
 import ru.taskservice.enums.DefaultStatus;
 import ru.taskservice.model.*;
 import ru.taskservice.repository.DatabaseConnection;
@@ -59,16 +58,7 @@ public class TaskService {
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
-            while (rs.next()) {
-                Task task = new Task();
-                task.setId((UUID) rs.getObject("id"));
-                task.setName(rs.getString("name"));
-                task.setDescription(rs.getString("description"));
-                task.setDefaultStatus(DefaultStatus.fromString(rs.getString("default_status")));
-                task.setTimeToCompleteSeconds(rs.getLong("time_to_complete_seconds"));
-                task.setTimeToComplete(Duration.ofSeconds(rs.getLong("time_to_complete_seconds")));
-                tasks.add(task);
-            }
+            taskDesign(tasks, rs);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -77,7 +67,7 @@ public class TaskService {
     }
 
     public Collection<Task> findTasks(String keyword) {
-        String sql = "SELECT id, name, description, default_statusm, time_to_complete_seconds FROM tasks WHERE LOWER(name) LIKE ?";
+        String sql = "SELECT id, name, description, default_status, time_to_complete_seconds FROM tasks WHERE LOWER(name) LIKE ?";
         Collection<Task> tasks = new ArrayList<>();
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -85,22 +75,25 @@ public class TaskService {
             stmt.setString(1, "%" + keyword.toLowerCase() + "%");
 
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Task task = new Task();
-                    task.setId((UUID) rs.getObject("id"));
-                    task.setName(rs.getString("name"));
-                    task.setDescription(rs.getString("description"));
-                    task.setDefaultStatus(DefaultStatus.fromString(rs.getString("default_status")));
-                    task.setTimeToCompleteSeconds(rs.getLong("time_to_complete_seconds"));
-                    task.setTimeToComplete(Duration.ofSeconds(rs.getLong("time_to_complete_seconds")));
-
-                    tasks.add(task);
-                }
+                taskDesign(tasks, rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return tasks;
+    }
+
+    private void taskDesign(Collection<Task> tasks, ResultSet rs) throws SQLException {
+        while (rs.next()) {
+            Task task = new Task();
+            task.setId((UUID) rs.getObject("id"));
+            task.setName(rs.getString("name"));
+            task.setDescription(rs.getString("description"));
+            task.setDefaultStatus(DefaultStatus.fromString(rs.getString("default_status")));
+            task.setTimeToCompleteSeconds(rs.getLong("time_to_complete_seconds"));
+            task.setTimeToComplete(Duration.ofSeconds(rs.getLong("time_to_complete_seconds")));
+            tasks.add(task);
+        }
     }
 
     public boolean updateTaskField(UUID taskId, UpdateTaskFieldRequest request) {

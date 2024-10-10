@@ -32,7 +32,6 @@ public class TaskController {
 
     @PostMapping("/{id}/update/time")
     public String updateTimeToComplete(@PathVariable("id") UUID id, @RequestBody UpdateTimeRequest request) {
-//        UpdateTimeRequest request_ = new UpdateTimeRequest(id, request.getDuration());
         boolean success = taskManager.updateTimeToComplete(id, request);
         return success ? "Time updated successfully" : "Time not updated";
     }
