@@ -2,6 +2,8 @@ package ru.taskservice.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import ru.taskservice.enums.DefaultStatus;
+
 import java.time.Duration;
 import java.util.UUID;
 

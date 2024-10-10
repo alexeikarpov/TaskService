@@ -1,4 +1,4 @@
-package ru.taskservice.model;
+package ru.taskservice.enums;
 
 import lombok.Getter;
 

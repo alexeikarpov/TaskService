@@ -2,6 +2,8 @@ package ru.taskservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.taskservice.dto.CreateTaskRequest;
+import ru.taskservice.dto.UpdateTimeRequest;
 import ru.taskservice.model.*;
 import ru.taskservice.service.TaskService;
 

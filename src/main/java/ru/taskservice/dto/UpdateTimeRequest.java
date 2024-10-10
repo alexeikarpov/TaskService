@@ -1,4 +1,4 @@
-package ru.taskservice.model;
+package ru.taskservice.dto;
 
 import lombok.Getter;
 import lombok.Setter;

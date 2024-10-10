@@ -1,6 +1,8 @@
 package ru.taskservice.service;
 
 import org.springframework.stereotype.Service;
+import ru.taskservice.dto.UpdateTimeRequest;
+import ru.taskservice.enums.DefaultStatus;
 import ru.taskservice.model.*;
 import ru.taskservice.repository.DatabaseConnection;
 import java.sql.Connection;
@@ -88,8 +90,8 @@ public class TaskService {
                     task.setName(rs.getString("name"));
                     task.setDescription(rs.getString("description"));
                     task.setDefaultStatus(DefaultStatus.fromString(rs.getString("default_status")));
-                    task.setTimeToCompleteSeconds(rs.getLong("time_to_complete"));
-                    task.setTimeToComplete(Duration.ofSeconds(rs.getLong("time_to_complete")));
+                    task.setTimeToCompleteSeconds(rs.getLong("time_to_complete_seconds"));
+                    task.setTimeToComplete(Duration.ofSeconds(rs.getLong("time_to_complete_seconds")));
 
                     tasks.add(task);
                 }
