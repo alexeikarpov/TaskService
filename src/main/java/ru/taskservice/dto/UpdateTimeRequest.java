@@ -1,20 +1,15 @@
 package ru.taskservice.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.Duration;
-import java.util.UUID;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class UpdateTimeRequest {
-    private UUID id;
     private Duration duration;
-
-    public UpdateTimeRequest() {}
-
-    public UpdateTimeRequest(UUID id, Duration duration) {
-        this.id = id;
-        this.duration = duration;
-    }
 }

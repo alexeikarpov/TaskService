@@ -1,6 +1,7 @@
 package ru.taskservice.service;
 
 import org.springframework.stereotype.Service;
+import ru.taskservice.dto.UpdateTaskFieldRequest;
 import ru.taskservice.dto.UpdateTimeRequest;
 import ru.taskservice.enums.DefaultStatus;
 import ru.taskservice.model.*;
@@ -102,8 +103,34 @@ public class TaskService {
         return tasks;
     }
 
+    public boolean updateTaskField(UUID taskId, UpdateTaskFieldRequest request) {
+        String sql = "UPDATE tasks SET " + request.getFieldName() + " = ? WHERE id = ?";
 
-    public boolean updateTimeToComplete(UpdateTimeRequest request) {
+        // Список разрешённых для обновления полей
+        Set<String> allowedFields = Set.of("name", "description", "default_status");
+
+        // Проверяем, что переданное поле допустимо
+        if (!allowedFields.contains(request.getFieldName())) {
+            throw new IllegalArgumentException("Недопустимое поле для обновления: " + request.getFieldName());
+        }
+
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, request.getFieldValue()); // Устанавливаем новое значение для поля
+            stmt.setObject(2, taskId);   // Устанавливаем идентификатор задачи
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0; // Возвращаем true, если обновление прошло успешно
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public boolean updateTimeToComplete(UUID id, UpdateTimeRequest request) {
         String selectSql = "SELECT time_to_complete_seconds FROM tasks WHERE id = ?";
         String updateSql = "UPDATE tasks SET time_to_complete_seconds = ? WHERE id = ?";
 
@@ -111,7 +138,7 @@ public class TaskService {
             long currentTimeToComplete;
 
             try (PreparedStatement selectStmt = conn.prepareStatement(selectSql)) {
-                selectStmt.setObject(1, request.getId());
+                selectStmt.setObject(1, id);
 
                 try (ResultSet rs = selectStmt.executeQuery()) {
                     if (rs.next()) {
@@ -121,11 +148,15 @@ public class TaskService {
                     }
                 }
             }
+
+            if (request.getDuration().getSeconds() > currentTimeToComplete)
+                return false;
+
             long updatedTimeToComplete = currentTimeToComplete - request.getDuration().getSeconds();
 
             try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
                 updateStmt.setLong(1, updatedTimeToComplete);
-                updateStmt.setObject(2, request.getId());
+                updateStmt.setObject(2, id);
                 int rowsAffected = updateStmt.executeUpdate();
                 return rowsAffected > 0;
             }
@@ -134,5 +165,4 @@ public class TaskService {
             return false;
         }
     }
-
 }

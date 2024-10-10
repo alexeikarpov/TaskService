@@ -14,11 +14,12 @@ public enum DefaultStatus {
     }
     public static DefaultStatus fromString(String status) {
         for (DefaultStatus ds : DefaultStatus.values()) {
-            if (ds.getStatus().equalsIgnoreCase(status)) {
+            if (ds.getStatus().equalsIgnoreCase(status) || ds.name().equalsIgnoreCase(status)) {
                 return ds;
             }
         }
         throw new IllegalArgumentException("Не найдено соответствующее значение для статуса: " + status);
     }
+
 }
 

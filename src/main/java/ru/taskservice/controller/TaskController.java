@@ -3,6 +3,7 @@ package ru.taskservice.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.taskservice.dto.CreateTaskRequest;
+import ru.taskservice.dto.UpdateTaskFieldRequest;
 import ru.taskservice.dto.UpdateTimeRequest;
 import ru.taskservice.model.*;
 import ru.taskservice.service.TaskService;
@@ -31,9 +32,27 @@ public class TaskController {
 
     @PostMapping("/{id}/update/time")
     public String updateTimeToComplete(@PathVariable("id") UUID id, @RequestBody UpdateTimeRequest request) {
-        UpdateTimeRequest request_ = new UpdateTimeRequest(id, request.getDuration());
-        boolean success = taskManager.updateTimeToComplete(request_);
+//        UpdateTimeRequest request_ = new UpdateTimeRequest(id, request.getDuration());
+        boolean success = taskManager.updateTimeToComplete(id, request);
         return success ? "Time updated successfully" : "Time not updated";
+    }
+
+    @PostMapping("/{id}/update/name")
+    public String updateName(@PathVariable("id") UUID id, @RequestBody UpdateTaskFieldRequest request) {
+        boolean success = taskManager.updateTaskField(id, request);
+        return success ? "Name update successfully" : "Name not updated";
+    }
+
+    @PostMapping("/{id}/update/description")
+    public String updateDescription(@PathVariable("id") UUID id, @RequestBody UpdateTaskFieldRequest request) {
+        boolean success = taskManager.updateTaskField(id, request);
+        return success ? "Description update successfully" : "Description not updated";
+    }
+
+    @PostMapping("/{id}/update/status")
+    public String updateStatus(@PathVariable("id") UUID id, @RequestBody UpdateTaskFieldRequest request) {
+        boolean success = taskManager.updateTaskField(id, request);
+        return success ? "Status update successfully" : "Status not updated";
     }
 
     @DeleteMapping("/{id}/delete")
