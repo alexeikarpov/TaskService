@@ -1,9 +1,7 @@
 package ru.taskservice.service;
 
 import org.springframework.stereotype.Service;
-import ru.taskservice.model.DefaultStatus;
-import ru.taskservice.model.Task;
-import ru.taskservice.model.UpdateTimeRequest;
+import ru.taskservice.model.*;
 import ru.taskservice.repository.DatabaseConnection;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
